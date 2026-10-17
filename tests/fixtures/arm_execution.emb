@@ -1,0 +1,27 @@
+// Host-side ARM execution checks; no STM32 runtime calls or startup code.
+fn main() -> void {}
+fn add(a: i32, b: i32) -> i32 { return a + b }
+fn sum6(a: i32, b: i32, c: i32, d: i32, e: i32, f: i32) -> i32 {
+    return a + b + c + d + e + f
+}
+fn nested(a: i32) -> i32 { return 10 + sum6(add(a, 1), add(2, 3), 3, 4, 5, 6) }
+fn factorial(n: i32) -> i32 {
+    if n <= 1 { return 1 }
+    return n * factorial(n - 1)
+}
+fn countdown(n: i32) -> i32 {
+    let sum: i32 = 0
+    while n > 0 { sum = sum + n; n = n - 1 }
+    return sum
+}
+fn byte_wrap() -> u8 { return (255 + 1) / 2 }
+fn signed_div() -> i32 { return -7 / 3 }
+fn signed_mod() -> i32 { return -7 % 3 }
+fn unsigned_div() -> u32 { return 4294967295 / 3 }
+fn unsigned_mod() -> u32 { return 4294967295 % 7 }
+fn unsigned_compare() -> bool { let x: u32 = 4294967295; return x > 1 }
+fn signed_compare() -> bool { return -1 < 1 }
+fn negation() -> i32 { let x: i32 = 12; return -x }
+fn forever() -> bool { while true {} }
+fn short_circuit() -> bool { return (false && forever()) || (true || forever()) }
+fn bool_parameter(x: bool) -> bool { return x }

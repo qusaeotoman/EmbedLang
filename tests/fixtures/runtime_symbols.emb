@@ -1,0 +1,15 @@
+// Link coverage only. This fixture is not a remote laboratory test.
+fn main() -> void {
+    gpio_mode(LED_GREEN, OUTPUT)
+    gpio_mode(LED_YELLOW, OUTPUT)
+    gpio_mode(LED_RED, OUTPUT)
+    gpio_mode(BUTTON_1, INPUT)
+    gpio_write(LED_GREEN, HIGH)
+    gpio_write(LED_YELLOW, LOW)
+    gpio_toggle(LED_RED)
+    let button: bool = gpio_read(BUTTON_1)
+    let time: u32 = millis()
+    if button && time > 0 {
+        delay_ms(1)
+    }
+}

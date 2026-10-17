@@ -1,0 +1,9 @@
+// Pure arithmetic: validates arguments, return value and the C-to-EmbedLang ABI.
+fn diagnostic_probe(a: u32, b: u32) -> u32 {
+    let result: u32 = a * b
+    return result
+}
+
+fn main() -> void {
+    let answer: u32 = diagnostic_probe(6, 7)
+}

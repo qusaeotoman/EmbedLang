@@ -1,0 +1,12 @@
+// Finite cLAB test: about 2.5 seconds, then return to trace finalization.
+fn main() -> void {
+    gpio_mode(LED_GREEN, OUTPUT)
+    gpio_write(LED_GREEN, LOW)
+    let count: u32 = 0
+    while count < 10 {
+        gpio_toggle(LED_GREEN)
+        delay_ms(250)
+        count = count + 1
+    }
+    gpio_write(LED_GREEN, LOW)
+}

@@ -1,0 +1,7 @@
+func @main() -> void {
+  call builtin @gpio_mode($LED_GREEN:u32, $OUTPUT:u32):void
+  while true:bool {
+    call builtin @gpio_toggle($LED_GREEN:u32):void
+    call builtin @delay_ms(500:u32):void
+  }
+}

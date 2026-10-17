@@ -1,0 +1,2 @@
+# Preserve byte-for-byte upstream snapshots and their recorded checksums.
+firmware/vendor/** -text

@@ -1,0 +1,8 @@
+fn main() -> void {
+    gpio_mode(LED_GREEN, OUTPUT)
+
+    while true {
+        gpio_toggle(LED_GREEN)
+        delay_ms(500)
+    }
+}

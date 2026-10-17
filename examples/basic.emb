@@ -1,0 +1,23 @@
+// Functions may be called before their declaration.
+fn main() -> void {
+    let count: i32 = add(10, 20)
+    let enabled: bool = count >= 30 && !false
+    let byte: u8 = 255
+    let started: u32 = millis()
+
+    if enabled {
+        count = count + 1
+    } else {
+        count = 0
+    }
+
+    while count > 0 {
+        count = count - 1
+    }
+    gpio_write(LED_GREEN, HIGH)
+    return
+}
+
+fn add(a: i32, b: i32) -> i32 {
+    return a + b
+}

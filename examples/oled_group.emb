@@ -1,0 +1,22 @@
+// ASCII text supplied by EmbedLang, rendered with the SDK's 7x10 font.
+// "THE BEST GROUP" is 14 characters: 98 pixels, centered at (15, 27).
+fn main() -> void {
+    if !oled_init() { return }
+    oled_clear()
+    let ok: bool = oled_cursor(15, 27)
+    ok = ok && oled_write_char(84)  // T
+    ok = ok && oled_write_char(72)  // H
+    ok = ok && oled_write_char(69)  // E
+    ok = ok && oled_write_char(32)
+    ok = ok && oled_write_char(66)  // B
+    ok = ok && oled_write_char(69)  // E
+    ok = ok && oled_write_char(83)  // S
+    ok = ok && oled_write_char(84)  // T
+    ok = ok && oled_write_char(32)
+    ok = ok && oled_write_char(71)  // G
+    ok = ok && oled_write_char(82)  // R
+    ok = ok && oled_write_char(79)  // O
+    ok = ok && oled_write_char(85)  // U
+    ok = ok && oled_write_char(80)  // P
+    if ok { oled_update() }
+}
