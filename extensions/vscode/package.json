@@ -1,0 +1,154 @@
+{
+  "name": "embedlang",
+  "displayName": "EmbedLang",
+  "description": "EmbedLang syntax, compiler diagnostics, typed IR and ARM assembly commands.",
+  "version": "0.1.0",
+  "publisher": "qusaeotoman",
+  "private": true,
+  "license": "UNLICENSED",
+  "engines": {
+    "vscode": "^1.85.0",
+    "node": ">=22"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/qusaeotoman/EmbedLang.git",
+    "directory": "extensions/vscode"
+  },
+  "main": "./src/extension.js",
+  "activationEvents": [
+    "onLanguage:embedlang"
+  ],
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": "limited",
+      "description": "Syntax highlighting works; executing the compiler requires a trusted workspace.",
+      "restrictedConfigurations": [
+        "embedlang.compilerDirectory",
+        "embedlang.javaPath",
+        "embedlang.localDebug.repositoryDirectory",
+        "embedlang.localDebug.toolchainDirectory",
+        "embedlang.localDebug.pythonPath",
+        "embedlang.localDebug.pythonModulePath"
+      ]
+    },
+    "virtualWorkspaces": false
+  },
+  "contributes": {
+    "languages": [
+      {
+        "id": "embedlang",
+        "aliases": [
+          "EmbedLang",
+          "embedlang"
+        ],
+        "extensions": [
+          ".emb"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "embedlang",
+        "scopeName": "source.embedlang",
+        "path": "./syntaxes/embedlang.tmLanguage.json"
+      }
+    ],
+    "commands": [
+      {
+        "command": "embedlang.validate",
+        "title": "EmbedLang: Validate Current File",
+        "enablement": "isWorkspaceTrusted && editorLangId == embedlang"
+      },
+      {
+        "command": "embedlang.emitIr",
+        "title": "EmbedLang: Emit Typed IR",
+        "enablement": "isWorkspaceTrusted && editorLangId == embedlang"
+      },
+      {
+        "command": "embedlang.emitAsm",
+        "title": "EmbedLang: Emit ARM Assembly",
+        "enablement": "isWorkspaceTrusted && editorLangId == embedlang"
+      },
+      {
+        "command": "embedlang.startLocalDebug",
+        "title": "EmbedLang: Debug Current File in Local Unicorn",
+        "enablement": "isWorkspaceTrusted && editorLangId == embedlang"
+      }
+    ],
+    "configuration": {
+      "title": "EmbedLang",
+      "properties": {
+        "embedlang.compilerDirectory": {
+          "type": "string",
+          "default": "",
+          "scope": "resource",
+          "description": "Installed EmbedLang distribution directory containing lib/compiler.jar. Empty uses compiler/build/install/embedlang in the document's workspace folder. Relative paths are resolved from that folder."
+        },
+        "embedlang.javaPath": {
+          "type": "string",
+          "default": "",
+          "scope": "resource",
+          "description": "Java 17 executable path. Empty uses JAVA_HOME/bin/java, then java on PATH. No command-line arguments or shell syntax."
+        },
+        "embedlang.validateOnSave": {
+          "type": "boolean",
+          "default": true,
+          "scope": "resource",
+          "description": "Validate saved .emb files in trusted workspaces."
+        },
+        "embedlang.timeoutMs": {
+          "type": "integer",
+          "default": 15000,
+          "minimum": 1000,
+          "maximum": 120000,
+          "scope": "resource",
+          "description": "Maximum compiler process duration in milliseconds."
+        },
+        "embedlang.localDebug.repositoryDirectory": {
+          "type": "string",
+          "default": "",
+          "scope": "resource",
+          "description": "EmbedLang repository containing tools/debug/unicorn_rsp.py. Empty uses the workspace root."
+        },
+        "embedlang.localDebug.toolchainDirectory": {
+          "type": "string",
+          "default": "",
+          "scope": "resource",
+          "description": "ARM GNU bin directory containing arm-none-eabi-as, ld, gdb, objdump and nm. Empty uses PATH."
+        },
+        "embedlang.localDebug.pythonPath": {
+          "type": "string",
+          "default": "",
+          "scope": "resource",
+          "description": "Python executable with Unicorn/pyelftools. Empty uses python on PATH."
+        },
+        "embedlang.localDebug.pythonModulePath": {
+          "type": "string",
+          "default": "",
+          "scope": "resource",
+          "description": "Optional local PYTHONPATH for the emulator. Empty inherits the environment."
+        }
+      }
+    },
+    "breakpoints": [
+      {
+        "language": "embedlang"
+      }
+    ]
+  },
+  "scripts": {
+    "test": "node --test test/unit.test.js test/local-debug.test.js",
+    "test:cli": "node --test test/cli.test.js",
+    "package:local": "vsce package --no-dependencies --skip-license --out build/embedlang-0.1.0.vsix"
+  },
+  "devDependencies": {
+    "@vscode/vsce": "4.0.0",
+    "vscode-textmate": "9.3.2",
+    "vscode-oniguruma": "2.0.1"
+  }
+}

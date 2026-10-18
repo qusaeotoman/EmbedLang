@@ -36,3 +36,14 @@ local.properties
 *.bak
 backups/
 flash-backups/
+node_modules/
+*.vsix
+
+# Zed editor parser outputs (regenerated from grammar.js)
+extensions/zed/tree-sitter/src/
+extensions/zed/tree-sitter/bindings/
+
+# Local Zed debug configuration and Rust build artifacts
+.zed/debug.json
+extensions/zed/debugger/target/
+extensions/zed/debugger/extension.wasm

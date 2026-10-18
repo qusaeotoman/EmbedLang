@@ -1,0 +1,21 @@
+{
+  "name": "embedlang-zed-development",
+  "version": "0.1.0",
+  "private": true,
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "generate": "cd tree-sitter && tree-sitter generate --abi 14",
+    "build": "node build.js",
+    "test": "node --test test/grammar.test.js test/tasks.test.js",
+    "test:debug": "node --test test/debug.test.js",
+    "test:wasm": "node --test test/wasm.test.js"
+  },
+  "devDependencies": {
+    "cdt-gdb-adapter": "1.10.0",
+    "tree-sitter-cli": "0.25.10",
+    "web-tree-sitter": "0.25.10"
+  }
+}

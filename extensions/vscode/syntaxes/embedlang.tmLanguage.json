@@ -1,0 +1,17 @@
+{
+  "name": "EmbedLang",
+  "scopeName": "source.embedlang",
+  "patterns": [
+    { "name": "comment.line.double-slash.embedlang", "begin": "//", "end": "$" },
+    { "name": "keyword.control.embedlang", "match": "\\b(fn|let|if|else|while|return)\\b" },
+    { "name": "storage.type.embedlang", "match": "\\b(i32|u32|u8|bool|void)\\b" },
+    { "name": "constant.language.boolean.embedlang", "match": "\\b(true|false|HIGH|LOW)\\b" },
+    { "name": "constant.other.embedlang", "match": "\\b(INPUT|OUTPUT|LED_GREEN|LED_YELLOW|LED_RED|BUTTON_1)\\b" },
+    { "name": "support.function.embedlang", "match": "\\b(gpio_mode|gpio_write|gpio_read|gpio_toggle|delay_ms|millis|oled_init|oled_clear|oled_cursor|oled_write_char|oled_update)\\b" },
+    { "name": "constant.numeric.integer.embedlang", "match": "\\b[0-9]+\\b" },
+    { "name": "entity.name.function.embedlang", "match": "\\b[a-zA-Z_][a-zA-Z_0-9]*(?=\\s*\\()" },
+    { "name": "keyword.operator.embedlang", "match": "->|==|!=|<=|>=|&&|\\|\\||[+*/%!=<>-]" },
+    { "name": "punctuation.separator.embedlang", "match": "[,:;]" },
+    { "name": "punctuation.section.embedlang", "match": "[{}()]" }
+  ]
+}

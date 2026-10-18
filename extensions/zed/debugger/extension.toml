@@ -1,0 +1,10 @@
+id = "embedlang-debugger"
+name = "EmbedLang Debugger"
+version = "0.1.0"
+schema_version = 1
+authors = ["EmbedLang contributors"]
+description = "Local ARM GDB/MI debugging through the standalone CDT DAP adapter."
+repository = "https://github.com/qusaeotoman/EmbedLang"
+
+[debug_adapters."EmbedLang GDB"]
+schema_path = "debug_adapter_schemas/embedlang.json"

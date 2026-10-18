@@ -2,6 +2,15 @@
 
 **A small, statically typed language for embedded systems, built with Kotlin and ANTLR4.**
 
+**Public source edition:** includes the compiler, VS Code and Zed source,
+DWARF/GDB debugging tools, tests and Russian report templates. See
+[publication notes](PUBLICATION_NOTES.md) for this edition's verified tests,
+dependencies and licensing exclusions. OLED driver/font files, generated
+firmware/WASM/VSIX files, private fixtures and machine configuration are excluded.
+The public update passed **253 applicable checks** with zero failures; one
+optional reference comparison was skipped. See the notes for the three historical
+preservation exclusions and seven unavailable OLED firmware checks.
+
 EmbedLang is a university Embedded Systems Programming project that takes a
 program from source through type checking and typed intermediate representation
 to GNU ARM Thumb-2 assembly. A separate firmware layer links generated code with
@@ -19,11 +28,6 @@ See [hardware validation](docs/HARDWARE_VALIDATION.md) for the observations,
 firmware hashes, dates and limits of these results. Local emulation and physical
 hardware evidence are recorded separately.
 
-> **Public source edition:** six upstream files without confirmed redistribution
-> permission are excluded. Compiler, cLAB and local Blink sources are included;
-> rebuilding the historical OLED demonstration requires separately permitted
-> OLED driver/font files. See [publication notes](PUBLICATION_NOTES.md).
-
 ## Features
 
 - Kotlin frontend with an ANTLR4 lexer/parser, source-located diagnostics and a
@@ -37,15 +41,17 @@ hardware evidence are recorded separately.
   verification and pinned, checksummed upstream sources.
 
 ```text
-Source в†’ ANTLR parse tree в†’ AST в†’ semantic analysis в†’ typed IR в†’ ARM assembly
-                                                             в†“
-                             startup + runtime + linker в†’ ELF в†’ BIN
+Source → ANTLR parse tree → AST → semantic analysis → typed IR → ARM assembly
+                                                             ↓
+                             startup + runtime + linker → ELF → BIN
 ```
 
 This is an educational compiler with a deliberately small scope. Strings,
 floating point, pointers, heap allocation, classes, modules and threads are not
-implemented. OLED text uses printable ASCII character codes. GDB and editor
-integrations remain future milestones.
+implemented. OLED text uses printable ASCII character codes. Local VS Code
+GDB source debugging and a separate Zed editing prototype are available;
+Zed 1.24.2 local source debugging has now been exercised in the real Windows
+editor, using Eclipse CDT, ARM GDB and a localhost Unicorn target.
 
 ## Example
 
@@ -106,26 +112,32 @@ ignored build directories. The portable compiler suite contains **82 JUnit tests
 
 Firmware builds additionally require ARM GNU Toolchain 13.3.Rel1, Python 3.10+
 and the packages in `firmware/requirements-tests.txt`. Set `$armBin` to your ARM
-toolchain's `bin` directory, then build the local F427 Blink demonstration:
+toolchain's `bin` directory, then build the local F427 OLED demonstration:
 
 ```powershell
 python -m pip install -r firmware/requirements-tests.txt
-python firmware/build_local.py examples/remote_blink.emb --mcu stm32f427vit6 --toolchain-bin $armBin
+python firmware/build_local.py examples/oled_group.emb --mcu stm32f427vit6 --oled --toolchain-bin $armBin
+python tests/local_oled_checks.py -v
 ```
 
 The builder uses the installed compiler distribution from the preceding step.
-ELF/BIN output is under `firmware/build/local_blink_f427/`. OLED and
-cLAB profiles use separate outputs. The public OLED build is unavailable until
-the excluded driver/font files have been supplied with appropriate permission. Build/test commands do not upload firmware.
+ELF/BIN output is under `firmware/build/local_oled_f427/`. Existing Blink and
+cLAB profiles use separate outputs. Build/test commands do not upload firmware.
 
 | Target | Firmware layout | Guide |
 | --- | --- | --- |
 | Local STM32F427VIT6 SDK-1.1M | Flash at 0x08000000; 2 MiB Flash, 192 KiB main SRAM + 64 KiB CCM | [Local F427](docs/LOCAL_F427.md) |
-| Local F427 OLED | Same Flash profile, I2C1 PB8/PB9, 128Г—64 panel | [OLED runtime and validation](docs/LOCAL_OLED.md) |
+| Local F427 OLED | Same Flash profile, I2C1 PB8/PB9, 128×64 panel | [OLED runtime and validation](docs/LOCAL_OLED.md) |
 | ITMO.cLAB STM32F407 | Official SRAM loader layout; separate runtime and trace lifecycle | [ITMO.cLAB](docs/ITMO_CLAB.md) |
 
-The last complete local verification passed **160 checks**: 82 compiler, 15 ARM
-execution, 43 cLAB/runtime, 13 local Flash and 7 OLED checks. Optional emulation
+The latest local regression passed **264 checks**: the original 160 (82 compiler,
+15 ARM execution, 43 cLAB/runtime, 13 local Flash and 7 OLED), 37 VS Code checks,
+24 Zed parser/task checks, 8 GDB/RSP checks, 7 new compiler/CLI source-mapping checks
+and 5 source-debug integration checks, plus 3 local-debug unit checks, 1 interactive
+RSP check and 8 actual VS Code/Cortex-Debug scenarios, then 7 Zed DAP/configuration,
+2 Rust and 2 component-WASM checks. Actual Zed 1.24.2 UI observations are recorded
+separately from automated tests; see the
+[verification journal](docs/report/VERIFICATION.md). Optional emulation
 suites require their corresponding built images; historical preservation tests
 also require local reference fixtures, which are not distributed with the
 repository. These counts describe the recorded validation, not an automated
@@ -133,6 +145,83 @@ GitHub CI result. See the [development guide](docs/DEVELOPMENT_GUIDE.md) and
 [STM32 runtime guide](docs/STM32_RUNTIME.md) for the full setup and individual suites.
 
 ## Documentation
+
+### Milestone 6: local VS Code extension and living report
+
+[`extensions/vscode`](extensions/vscode/) provides `.emb` recognition, TextMate
+highlighting, language configuration, source-located Problems and commands to
+validate or emit typed IR / ARM assembly through the existing CLI. Build the
+compiler distribution first; no STM32 hardware is required. See the
+[extension setup, tests and local VSIX instructions](extensions/vscode/README.md).
+The extension is not published to the Marketplace, and these milestone changes
+have not been pushed to GitHub.
+
+The [incremental Russian report](docs/report/REPORT.md) leaves the title page,
+technical requirements, architectural explanation and real AI-prompt history for
+personal student authorship. Verified source-based supporting material is in
+[technical appendices](docs/report/APPENDICES.md); actual local test results are
+recorded in the [verification journal](docs/report/VERIFICATION.md). The official
+ITMO assignment is now identified; the [source-based requirements matrix](docs/report/ASSIGNMENT_MAPPING.md)
+distinguishes implemented features from outstanding editor acceptance and GDB/TCP-IP work.
+Update the report after each subsequent milestone using its
+[maintenance rules](docs/report/README.md).
+
+### Local Zed support
+
+[`extensions/zed`](extensions/zed/README.md) provides an editor-only Tree-sitter
+grammar, `.emb` configuration, highlighting, bracket/indent and outline queries.
+The repository's [Zed tasks](.zed/tasks.json) build the compiler, validate saved
+files and emit IR/ARM assembly using the existing CLI. Diagnostics retain source
+locations in the terminal; there is no Zed Problems/LSP integration yet.
+
+See the guide for reproducible grammar compilation, local unpacked installation
+and its limitations. Zed 1.24.2 displayed highlighting and matched braces, and
+successfully ran Validate in an isolated profile. No
+board or publication was involved. The editor/report work was preserved locally
+as `40fa242`; subsequent GDB investigation is described below.
+
+### Milestone 7: local GDB/TCP connection proof
+
+An isolated [Unicorn RSP target](tools/debug/unicorn_rsp.py) executes actual
+compiler-generated ARM code over loopback TCP with ARM GDB. Verified: symbol
+breakpoint, instruction step, registers/stack memory and arithmetic result 42.
+The [investigation and reproduction guide](docs/GDB_DEBUGGING.md) records ELF
+symbols/DWARF findings and the plan for VS Code/Zed adapters. Existing firmware
+and runtime behavior remain unchanged. The subsequent optional mode
+`embedlang --emit-asm --debug-lines program.emb` adds actual `.emb` line mappings.
+[Source-debug tests](docs/SOURCE_DEBUGGING.md) demonstrate a file/line breakpoint
+and GDB `step` through lines 2–6 with result 42 over localhost TCP. Typed locals,
+comprehensive unwinding and physical debugging are **not** demonstrated.
+Default assembly output remains unchanged. Source mapping is preserved locally
+as `87807cefcb7eb96445ab79cb8f5c162a53ef5681`.
+
+### VS Code: local source debugging
+
+The [local debugging guide](docs/VSCODE_DEBUGGING.md) describes the optional
+Cortex-Debug → ARM GDB/MI2 → localhost Unicorn workflow. Actual VS Code tests
+verified `.emb` breakpoints, source Step Into, Continue/Pause, a useful top frame,
+registers/disassembly and result 42. The command builds a pure CPU ELF, not STM32
+firmware. Typed locals and complete unwinding remain incomplete.
+This VS Code milestone is preserved as `b4bd308d56685035d35267241c5fbc2fb41aba33`
+and has not been published.
+
+### Zed: local source debugging
+
+The separate [Zed debugger guide](docs/ZED_DEBUGGING.md) provides installation,
+machine-local debug configuration and the exact manual acceptance checklist.
+Rust/WASI compilation against official Zed API 0.7.0 succeeded. Actual standalone
+CDT 1.10.0/GDB/TCP tests verified `.emb` breakpoints, stepping, Pause/resume,
+registers/disassembly and result 42. Following approved installation, actual
+**Zed 1.24.2** testing confirmed both extensions load, `.emb:2` breakpoint,
+source steps 3–6, Continue/Pause/resume, registers, useful stack entries,
+result 42 and cleanup. Instruction inspection worked through the GDB console;
+a dedicated disassembly pane was not demonstrated. UI testing found and fixed
+the extension package target: **wasm32-wasip2** components are required by this
+Zed version. The earlier build/protocol milestone remains preserved as `cca8b36`;
+the packaging fix and actual UI verification are preserved in the subsequent
+local Zed UI milestone. This public source update exports those verified changes
+without publishing the original local Git history. Compile extensions locally;
+no binary extension release is bundled.
 
 - [Architecture](docs/ARCHITECTURE.md) and [requirements](docs/REQUIREMENTS.md)
 - [Language specification](docs/LANGUAGE_SPEC.md) and [IR format](docs/IR.md)
@@ -149,10 +238,9 @@ board runtime, builders, verifier and required upstream snapshots.
 ## Licensing and attribution
 
 Third-party components retain their original notices, including ST BSD notices,
-CMSIS Apache-2.0 material and GPL-3.0 cLAB components. Upstream OLED/font
-files and two board/project reference files without confirmed redistribution
-permission are excluded; see [publication notes](PUBLICATION_NOTES.md) and
-[THIRD_PARTY.md](firmware/THIRD_PARTY.md).
+CMSIS Apache-2.0 material and GPL-3.0 cLAB components. Some upstream OLED/font
+files have no explicit license notice in the inspected snapshot; that status is
+recorded in [THIRD_PARTY.md](firmware/THIRD_PARTY.md).
 
 No project-wide license has been selected for the original EmbedLang code.
 Do not assume that all files share one license or replace upstream notices when

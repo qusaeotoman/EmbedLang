@@ -1,0 +1,11 @@
+fn source_probe() -> u32 {
+    let left: u32 = 6
+    let right: u32 = 7
+    let product: u32 = left * right
+    product = product + 0
+    return product
+}
+
+fn main() -> void {
+    let answer: u32 = source_probe()
+}

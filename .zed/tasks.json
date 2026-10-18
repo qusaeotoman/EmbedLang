@@ -1,0 +1,41 @@
+[
+  {
+    "label": "EmbedLang: Build compiler distribution",
+    "command": "node",
+    "args": ["extensions/zed/task.js", "build"],
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "allow_concurrent_runs": false,
+    "reveal": "always",
+    "save": "all"
+  },
+  {
+    "label": "EmbedLang: Validate saved file",
+    "command": "node",
+    "args": ["extensions/zed/task.js", "validate"],
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "env": { "ZED_FILE": "$ZED_FILE" },
+    "allow_concurrent_runs": false,
+    "reveal": "always",
+    "save": "current"
+  },
+  {
+    "label": "EmbedLang: Emit typed IR",
+    "command": "node",
+    "args": ["extensions/zed/task.js", "ir"],
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "env": { "ZED_FILE": "$ZED_FILE" },
+    "allow_concurrent_runs": false,
+    "reveal": "always",
+    "save": "current"
+  },
+  {
+    "label": "EmbedLang: Emit ARM assembly",
+    "command": "node",
+    "args": ["extensions/zed/task.js", "asm"],
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "env": { "ZED_FILE": "$ZED_FILE" },
+    "allow_concurrent_runs": false,
+    "reveal": "always",
+    "save": "current"
+  }
+]

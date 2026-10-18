@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "EmbedLang local ARM GDB via CDT",
+  "type": "object",
+  "required": ["request", "nodePath", "cdtAdapterPath", "program", "cwd", "gdb", "target"],
+  "properties": {
+    "request": { "const": "launch" },
+    "nodePath": { "type": "string", "description": "Absolute Node.js executable path" },
+    "cdtAdapterPath": { "type": "string", "description": "Absolute cdt-gdb-adapter/dist/debugTargetAdapter.js path (tested 1.10.0)" },
+    "program": { "type": "string" },
+    "cwd": { "type": "string" },
+    "gdb": { "type": "string" },
+    "target": {
+      "type": "object",
+      "required": ["host", "type", "server", "serverParameters", "serverPortRegExp"],
+      "properties": {
+        "host": { "const": "127.0.0.1" },
+        "type": { "const": "remote" },
+        "server": { "type": "string" },
+        "serverParameters": { "type": "array", "items": { "type": "string" } },
+        "serverPortRegExp": { "type": "string" }
+      }
+    }
+  }
+}

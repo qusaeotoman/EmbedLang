@@ -1,0 +1,16 @@
+id = "embedlang"
+name = "EmbedLang"
+version = "0.1.0"
+schema_version = 1
+authors = ["EmbedLang contributors"]
+description = "EmbedLang highlighting and saved-file compiler tasks (local prototype)."
+repository = "https://github.com/qusaeotoman/EmbedLang"
+languages = ["languages/embedlang"]
+
+# Unpacked, locally compiled package. No grammar-fetch revision is configured.
+# Runtime loads grammars/embedlang.wasm; do NOT use Install Dev Extension on this
+# package: Zed's dev builder would try to fetch the intentionally empty revision.
+[grammars.embedlang]
+repository = "https://github.com/qusaeotoman/EmbedLang"
+rev = ""
+path = "extensions/zed/tree-sitter"

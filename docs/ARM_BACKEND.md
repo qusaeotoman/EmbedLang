@@ -7,7 +7,8 @@ vector tables, linker scripts, runtime bodies, binary emission, flashing,
 debugger integration, and editor plugins remain outside this milestone.
 
 Milestone 4A now provides startup, linking and runtime separately in `firmware/`;
-see [STM32_RUNTIME.md](STM32_RUNTIME.md). The assembly emitter is unchanged.
+see [STM32_RUNTIME.md](STM32_RUNTIME.md). Default assembly output is preserved;
+the later optional source-line mode is described below.
 
 ## Entry point and output
 
@@ -24,6 +25,17 @@ successfully checked source and emits no partial assembly on frontend errors.
 `main` retains its name. Other user functions become `embed_fn_<name>` and
 built-ins become `embed_<name>`, preventing collisions between user and runtime
 names. Labels are globally unique within an emitted file and deterministic.
+
+## Optional source-line metadata
+
+Optional source-line mode is available as
+`embedlang --emit-asm --debug-lines program.emb`, or
+`ArmBackend.emit(program, debugLines = true)`. It emits GNU `.file`/`.loc`
+metadata from existing IR locations, with original paths and statement lines.
+Assemble with `-g` (the tested pipeline also selects `--gdwarf-4`). This does not
+change instructions, register allocation or the ABI. It supplies source lines,
+not typed locals or comprehensive unwind information. See
+[SOURCE_DEBUGGING.md](SOURCE_DEBUGGING.md) for verified GDB results and limits.
 
 ## Registers and calling convention
 

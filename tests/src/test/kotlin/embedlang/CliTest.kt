@@ -9,6 +9,22 @@ import kotlin.test.*
 
 class CliTest {
     @TempDir lateinit var directory: Path
+    @Test fun `debug lines CLI uses original absolute source path`() {
+        val path = source("fn main() -> void {\n    let x: i32 = 42\n}")
+        val result = run("--emit-asm", "--debug-lines", path)
+        assertEquals(0, result.code, result.stderr)
+        val original = Path.of(path).toAbsolutePath().normalize().toString().replace(java.io.File.separatorChar, '/')
+        assertContains(result.stdout, ".file 1 \"$original\"")
+        assertContains(result.stdout, ".loc 1 2 5 is_stmt 1")
+    }
+    @Test fun `debug lines reject invalid modes and fail without partial assembly`() {
+        assertEquals(2, run("--debug-lines", source("fn main() -> void {}" )).code)
+        assertEquals(2, run("--emit-ir", "--debug-lines", source("fn main() -> void {}" )).code)
+        val result = run("--emit-asm", "--debug-lines", source("fn main() -> void { missing() }"))
+        assertEquals(1, result.code)
+        assertEquals("", result.stdout)
+        assertContains(result.stderr, "UNDEFINED_FUNCTION")
+    }
     private data class Result(val code: Int, val stdout: String, val stderr: String)
 
     private fun source(text: String): String {

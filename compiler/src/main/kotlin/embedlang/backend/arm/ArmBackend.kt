@@ -1,14 +1,35 @@
 package embedlang.backend.arm
 
 import embedlang.ast.Type
+import embedlang.ast.SourceLocation
 import embedlang.ir.*
 
 /** GNU Thumb-2 text emitter. Consumes validated typed IR without modifying it. */
 object ArmBackend {
-    fun emit(program: IrProgram): String = Emitter().emit(program)
+    fun emit(program: IrProgram, debugLines: Boolean = false): String = Emitter(debugLines).emit(program)
 
-    private class Emitter {
+    private class Emitter(private val debugLines: Boolean) {
         private val externals = sortedSetOf<String>()
+        private val sourceFiles = linkedMapOf<String, Int>()
+        private fun sourceFile(file: String) = sourceFiles.getOrPut(file) { sourceFiles.size + 1 }
+        private fun quotedFile(file: String) = buildString {
+            append('"')
+            // ASCII assembly carries exact UTF-8 path bytes, independent of the
+            // Java process's console encoding. GAS decodes these C escapes.
+            file.toByteArray(Charsets.UTF_8).forEach { byte ->
+                val code = byte.toInt() and 255
+                when (code) {
+                    92 -> append("\\\\")
+                    34 -> append("\\\"")
+                    10 -> append("\\n")
+                    13 -> append("\\r")
+                    9 -> append("\\t")
+                    else -> if (code < 32 || code >= 127)
+                        append("\\%03o".format(code)) else append(code.toChar())
+                }
+            }
+            append('"')
+        }
         private var nextLabel = 0
         private fun label(kind: String) = ".L${kind}_${nextLabel++}"
         private fun symbol(function: IrFunctionSymbol) =
@@ -18,6 +39,7 @@ object ArmBackend {
             val bodies = program.functions.map { FunctionEmitter(it).emit() }
             return buildString {
                 append(".syntax unified\n.cpu cortex-m4\n.thumb\n.text\n")
+                sourceFiles.forEach { (file, number) -> append(".file $number ${quotedFile(file)}\n") }
                 externals.forEach { append(".extern $it\n") }
                 bodies.forEach { append('\n'); append(it) }
                 append("\n.section .note.GNU-stack,\"\",%progbits\n")
@@ -33,6 +55,11 @@ object ArmBackend {
 
             private fun instruction(text: String) { body.append("    $text\n") }
             private fun mark(name: String) { body.append("$name:\n") }
+            private fun location(location: SourceLocation, statement: Boolean = true, flags: String = "") {
+                if (!debugLines) return
+                val file = sourceFile(location.file)
+                body.append(".loc $file ${location.line} ${location.column} is_stmt ${if (statement) 1 else 0}$flags\n")
+            }
             private fun reserve(count: Int = 1): Int {
                 val first = temporaryDepth
                 temporaryDepth += count
@@ -64,6 +91,7 @@ object ArmBackend {
                 body.clear()
                 val name = symbol(function.symbol)
                 body.append(".balign 2\n.global $name\n.type $name, %function\n.thumb_func\n$name:\n")
+                location(function.location, statement = false)
                 instruction("push {r7, lr}")
                 adjustStack(frameSize, subtract = true)
                 instruction("mov r7, sp")
@@ -77,6 +105,7 @@ object ArmBackend {
                 }
                 body.append(instructions)
                 mark(returnLabel)
+                location(function.location, statement = false, flags = " epilogue_begin")
                 instruction("mov sp, r7")
                 adjustStack(frameSize, subtract = false)
                 instruction("pop {r7, pc}")
@@ -124,6 +153,7 @@ object ArmBackend {
 
             private fun block(block: IrBlock) {
                 block.statements.forEach { statement ->
+                    location(statement.location)
                     when (statement) {
                         is IrLocalDeclaration -> { expression(statement.initializer); store("r0", localOffset(statement.local)) }
                         is IrAssignment -> { expression(statement.value); store("r0", localOffset(statement.local)) }
@@ -136,6 +166,7 @@ object ArmBackend {
                             instruction("cmp r0, #0")
                             instruction("beq.w $otherwise")
                             block(statement.thenBlock)
+                            location(statement.location, statement = false)
                             instruction("b.w $end")
                             mark(otherwise)
                             statement.elseBlock?.let { block(it) }
@@ -149,6 +180,7 @@ object ArmBackend {
                             instruction("cmp r0, #0")
                             instruction("beq.w $end")
                             block(statement.body)
+                            location(statement.location, statement = false)
                             instruction("b.w $start")
                             mark(end)
                         }
